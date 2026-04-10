@@ -1,0 +1,808 @@
+<!--
+GitHub Pages Hosting Instructions
+1. Upload this file renamed as index.html to a new GitHub repository
+2. In GitHub: Settings -> Pages -> Deploy from branch -> main -> /(root)
+3. Share the generated GitHub Pages URL with testers
+-->
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Circle MSP UAT Runner</title>
+  <link rel="preconnect" href="https://api.fontshare.com" />
+  <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700,900&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" defer></script>
+  <style>
+    :root,[data-theme="light"]{
+      --text-xs:clamp(.75rem,.7rem + .25vw,.875rem);
+      --text-sm:clamp(.875rem,.8rem + .35vw,1rem);
+      --text-base:clamp(1rem,.95rem + .25vw,1.125rem);
+      --text-lg:clamp(1.125rem,1rem + .75vw,1.5rem);
+      --text-xl:clamp(1.5rem,1.2rem + 1.25vw,2.25rem);
+      --space-1:.25rem;--space-2:.5rem;--space-3:.75rem;--space-4:1rem;--space-5:1.25rem;--space-6:1.5rem;--space-8:2rem;--space-10:2.5rem;--space-12:3rem;--space-16:4rem;
+      --color-bg:#f5f8fc;
+      --color-surface:#ffffff;
+      --color-surface-2:#eef5fb;
+      --color-surface-offset:#e6f0fa;
+      --color-border:rgba(18,59,104,.12);
+      --color-text:#123b68;
+      --color-text-muted:#4d6785;
+      --color-text-faint:#7e92aa;
+      --color-primary:#155fa0;
+      --color-primary-hover:#0d4a80;
+      --color-secondary:#f58220;
+      --color-secondary-hover:#d96b0d;
+      --color-success:#2e7d32;
+      --color-error:#c62828;
+      --color-warning:#ef6c00;
+      --radius-sm:.5rem;--radius-md:.875rem;--radius-lg:1.25rem;--radius-xl:1.5rem;--radius-full:999px;
+      --shadow-sm:0 1px 2px rgba(18,59,104,.08);
+      --shadow-md:0 10px 30px rgba(18,59,104,.10);
+      --shadow-lg:0 18px 50px rgba(18,59,104,.14);
+      --font-body:'Satoshi', Arial, sans-serif;
+      --font-display:'Satoshi', Arial, sans-serif;
+    }
+    [data-theme="dark"]{
+      --color-bg:#0d1a2b;
+      --color-surface:#13253c;
+      --color-surface-2:#17304d;
+      --color-surface-offset:#1c3b60;
+      --color-border:rgba(255,255,255,.12);
+      --color-text:#edf5ff;
+      --color-text-muted:#bfd3ea;
+      --color-text-faint:#89a4c4;
+      --color-primary:#5fa9ea;
+      --color-primary-hover:#85bdf1;
+      --color-secondary:#ff9d47;
+      --color-secondary-hover:#ffb36f;
+      --color-success:#7cc47f;
+      --color-error:#ef6f6c;
+      --color-warning:#ffb74d;
+      --shadow-sm:0 1px 2px rgba(0,0,0,.25);
+      --shadow-md:0 10px 30px rgba(0,0,0,.28);
+      --shadow-lg:0 18px 50px rgba(0,0,0,.38);
+    }
+    *,*:before,*:after{box-sizing:border-box}
+    html,body{margin:0;padding:0;font-family:var(--font-body);background:var(--color-bg);color:var(--color-text);min-height:100%}
+    body{font-size:var(--text-base);line-height:1.5}
+    button,input,select,textarea{font:inherit}
+    a{color:var(--color-primary)}
+    .app{display:grid;grid-template-columns:300px 1fr;min-height:100vh}
+    .sidebar{background:linear-gradient(180deg,var(--color-primary),#0f3f6b);color:#fff;padding:var(--space-6);position:sticky;top:0;height:100vh;overflow:auto}
+    .brand{display:flex;gap:var(--space-3);align-items:center;margin-bottom:var(--space-8)}
+    .logo{width:52px;height:52px;border-radius:16px;background:linear-gradient(135deg,var(--color-secondary),#ffb15f);display:grid;place-items:center;box-shadow:var(--shadow-md);flex-shrink:0}
+    .logo svg{width:30px;height:30px}
+    .brand h1{font-size:var(--text-lg);line-height:1.1;margin:0}
+    .brand p{margin:.25rem 0 0;color:rgba(255,255,255,.8);font-size:var(--text-sm)}
+    .nav{display:grid;gap:var(--space-2)}
+    .nav button{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.08);color:#fff;padding:.9rem 1rem;border-radius:14px;text-align:left;cursor:pointer}
+    .nav button.active,.nav button:hover{background:rgba(255,255,255,.18)}
+    .sidebar-note{margin-top:var(--space-8);padding:var(--space-4);background:rgba(255,255,255,.1);border-radius:16px;font-size:var(--text-sm)}
+    .main{padding:var(--space-6);overflow:auto}
+    .topbar{display:flex;justify-content:space-between;gap:var(--space-4);align-items:flex-start;flex-wrap:wrap;margin-bottom:var(--space-6)}
+    .headline h2{font-size:var(--text-xl);margin:0 0 .35rem}
+    .headline p{margin:0;color:var(--color-text-muted);max-width:75ch}
+    .top-actions{display:flex;gap:var(--space-3);flex-wrap:wrap}
+    .btn{border:none;border-radius:999px;padding:.8rem 1.1rem;font-weight:700;cursor:pointer}
+    .btn-primary{background:var(--color-primary);color:#fff}.btn-primary:hover{background:var(--color-primary-hover)}
+    .btn-secondary{background:var(--color-secondary);color:#fff}.btn-secondary:hover{background:var(--color-secondary-hover)}
+    .btn-ghost{background:var(--color-surface);color:var(--color-text);border:1px solid var(--color-border)}
+    .panel{display:none}
+    .panel.active{display:block}
+    .grid{display:grid;gap:var(--space-4)}
+    .kpis{grid-template-columns:repeat(6,minmax(0,1fr))}
+    .card{background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-lg);box-shadow:var(--shadow-sm);padding:var(--space-5)}
+    .metric{font-size:2rem;font-weight:900;margin:.25rem 0}
+    .muted{color:var(--color-text-muted)}
+    .small{font-size:var(--text-sm)}
+    .progress{height:12px;background:var(--color-surface-offset);border-radius:999px;overflow:hidden}
+    .progress > span{display:block;height:100%;background:linear-gradient(90deg,var(--color-secondary),var(--color-primary));width:0}
+    .status-pill{display:inline-flex;align-items:center;gap:.45rem;padding:.45rem .75rem;border-radius:999px;font-weight:700;font-size:var(--text-sm)}
+    .go{background:rgba(46,125,50,.14);color:var(--color-success)}
+    .conditional{background:rgba(239,108,0,.14);color:var(--color-warning)}
+    .nogo{background:rgba(198,40,40,.14);color:var(--color-error)}
+    .two-col{grid-template-columns:1.2fr .8fr}
+    .three-col{grid-template-columns:repeat(3,minmax(0,1fr))}
+    .module-card{padding:var(--space-5);border-radius:var(--radius-lg);background:var(--color-surface);border:1px solid var(--color-border);display:flex;flex-direction:column;gap:var(--space-4)}
+    .module-head{display:flex;justify-content:space-between;gap:var(--space-3);align-items:flex-start}
+    .badge{display:inline-block;padding:.3rem .65rem;border-radius:999px;background:rgba(245,130,32,.14);color:var(--color-secondary);font-size:var(--text-xs);font-weight:800;text-transform:uppercase;letter-spacing:.04em}
+    .exercise-list{display:grid;gap:var(--space-3)}
+    .exercise{border:1px solid var(--color-border);border-radius:16px;padding:var(--space-4);background:var(--color-surface-2)}
+    .exercise header{display:flex;justify-content:space-between;gap:var(--space-3);margin-bottom:.6rem;align-items:flex-start}
+    .exercise h4{margin:0;font-size:1rem}
+    .actions{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:var(--space-3)}
+    .status-btn{border:none;padding:.55rem .8rem;border-radius:999px;cursor:pointer;font-weight:700}
+    .pass{background:rgba(46,125,50,.14);color:var(--color-success)}
+    .fail{background:rgba(198,40,40,.14);color:var(--color-error)}
+    .blocked{background:rgba(239,108,0,.14);color:var(--color-warning)}
+    .skip{background:rgba(21,95,160,.14);color:var(--color-primary)}
+    .status-tag{padding:.25rem .55rem;border-radius:999px;font-size:var(--text-xs);font-weight:800;background:var(--color-surface);border:1px solid var(--color-border)}
+    .filters{display:flex;gap:var(--space-3);flex-wrap:wrap;margin-bottom:var(--space-4)}
+    .field, .field textarea, .field select, .field input{width:100%}
+    .field label{display:block;font-size:var(--text-sm);font-weight:700;margin-bottom:.35rem}
+    input,select,textarea{border:1px solid var(--color-border);background:var(--color-surface);color:var(--color-text);border-radius:14px;padding:.8rem .9rem}
+    textarea{min-height:110px;resize:vertical}
+    table{width:100%;border-collapse:collapse}
+    th,td{padding:.85rem .7rem;border-bottom:1px solid var(--color-border);text-align:left;vertical-align:top;font-size:var(--text-sm)}
+    th{color:var(--color-text-muted);font-size:var(--text-xs);text-transform:uppercase;letter-spacing:.04em}
+    .table-wrap{overflow:auto}
+    .toolbar{display:flex;justify-content:space-between;gap:var(--space-3);flex-wrap:wrap;margin-bottom:var(--space-4)}
+    .inline{display:flex;gap:var(--space-3);flex-wrap:wrap;align-items:center}
+    .toast-wrap{position:fixed;right:16px;bottom:16px;display:grid;gap:12px;z-index:9999}
+    .toast{background:var(--color-surface);border:1px solid var(--color-border);box-shadow:var(--shadow-lg);padding:1rem 1rem;border-radius:16px;min-width:280px}
+    .instruction{border-left:5px solid var(--color-secondary);padding:var(--space-4);background:rgba(245,130,32,.08);border-radius:0 16px 16px 0}
+    .coverage{height:10px;border-radius:999px;background:var(--color-surface-offset);overflow:hidden}
+    .coverage span{display:block;height:100%;background:linear-gradient(90deg,var(--color-secondary),var(--color-primary))}
+    .signature{padding:var(--space-4);border:1px dashed var(--color-border);border-radius:16px;background:var(--color-surface-2)}
+    .footer-note{margin-top:var(--space-6);font-size:var(--text-sm);color:var(--color-text-muted)}
+    @media (max-width:1100px){.app{grid-template-columns:1fr}.sidebar{position:relative;height:auto}.kpis,.two-col,.three-col{grid-template-columns:1fr 1fr}}
+    @media (max-width:720px){.kpis,.two-col,.three-col{grid-template-columns:1fr}.main{padding:1rem}.sidebar{padding:1rem}.top-actions,.filters,.toolbar,.inline,.actions{width:100%}.btn,.status-btn{width:100%}}
+  </style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="logo" aria-label="Circle MSP logo mark">
+        <svg viewBox="0 0 64 64" fill="none" aria-hidden="true">
+          <circle cx="32" cy="32" r="22" stroke="#123b68" stroke-width="8"/>
+          <path d="M32 10a22 22 0 0 1 19.8 12.4" stroke="#fff" stroke-width="8" stroke-linecap="round"/>
+          <circle cx="47" cy="18" r="6" fill="#fff"/>
+        </svg>
+      </div>
+      <div>
+        <h1>Circle MSP UAT Runner</h1>
+        <p>Module-based access testing workspace</p>
+      </div>
+    </div>
+    <nav class="nav" id="nav"></nav>
+    <div class="sidebar-note">
+      <strong>Bug reporting rule</strong><br>
+      When bugs are found, users should submit feedback through the Userback link in CUS at the bottom-right corner.
+    </div>
+  </aside>
+  <main class="main">
+    <div class="topbar">
+      <div class="headline">
+        <h2>Mr UAT here — your Circle MSP testing app is ready.</h2>
+        <p>This self-contained app lets testers run exercises by module, filter by access level, record pass/fail/blocked outcomes, log defects, review coverage, export results, and capture sign-off for CUS UAT execution. It now reflects the v3.2 consolidated guide, including the expanded Opportunities module and additional exercises. Open this app in one browser window and keep CUS open in a second window beside it while you test.</p>
+      </div>
+      <div class="top-actions">
+        <button class="btn btn-ghost" id="themeToggle" aria-label="Toggle theme">Toggle theme</button>
+        <button class="btn btn-secondary" id="openCusBtn">Open CUS</button><button class="btn btn-secondary" id="seedDataBtn">Load sample results</button>
+        <button class="btn btn-primary" id="exportBtn">Export summary JSON</button>
+        <button class="btn btn-primary" id="exportCsvBtn">Export summary CSV</button>
+      </div>
+    </div>
+
+    <section id="dashboard" class="panel active">
+      <div class="grid kpis">
+        <div class="card"><div class="small muted">Total exercises</div><div class="metric" id="mTotal">0</div></div>
+        <div class="card"><div class="small muted">Executed</div><div class="metric" id="mExecuted">0</div></div>
+        <div class="card"><div class="small muted">Passed</div><div class="metric" id="mPassed">0</div></div>
+        <div class="card"><div class="small muted">Failed</div><div class="metric" id="mFailed">0</div></div>
+        <div class="card"><div class="small muted">Blocked</div><div class="metric" id="mBlocked">0</div></div>
+        <div class="card"><div class="small muted">Pass rate</div><div class="metric" id="mPassRate">0%</div></div>
+      </div>
+
+      <div class="card" style="margin-top:1rem;">
+        <div class="toolbar">
+          <div>
+            <h3 style="margin:0 0 .35rem;">Execution progress</h3>
+            <div id="goPill" class="status-pill conditional">Conditional Go</div>
+          </div>
+          <div class="inline">
+            <label class="small muted">Tester name</label>
+            <input id="testerName" placeholder="Enter tester name" />
+            <label class="small muted">Access level</label>
+            <select id="accessLevel">
+              <option value="All">All</option>
+              <option value="Standard">Standard</option>
+              <option value="Administrator">Administrator</option>
+            </select>
+          </div>
+        </div>
+        <div class="progress"><span id="overallProgress"></span></div>
+        <p class="footer-note">Use this app to execute the seven UAT modules from the consolidated Circle MSP guide, including authentication, dashboards, forecast, scoreboard, companies, company activity logging, and contacts workflows.</p>
+      </div>
+
+      <div class="grid two-col" style="margin-top:1rem;">
+        <div class="card">
+          <h3 style="margin-top:0;">Results by status</h3>
+          <canvas id="statusChart" height="220"></canvas>
+        </div>
+        <div class="card">
+          <h3 style="margin-top:0;">Tester instructions</h3>
+          <div class="instruction">
+            Open this app in one window and CUS in another window side-by-side before you begin. You may skip an entire module before starting it, but once you begin a module, you must finish every exercise in that module before moving to another one. If you hit a bug, submit it using the Userback feedback link in CUS at the bottom-right corner, then capture the defect ID in this app.
+          </div>
+          <ul class="small muted">
+            <li>Standard users should keep this app open in one window and CUS open in the other for side-by-side execution.</li><li>Standard users should focus on role-appropriate dashboard, company, and contact visibility.</li>
+            <li>Administrators should also validate team, rep, and date filter behavior where called out.</li>
+            <li>Export the summary at the end and attach it to your UAT reporting package.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section id="modules" class="panel"></section>
+
+    <section id="defects" class="panel">
+      <div class="grid two-col">
+        <div class="card">
+          <h3 style="margin-top:0;">Log defect</h3>
+          <div class="grid">
+            <div class="field"><label>Defect title</label><input id="defectTitle" placeholder="Ex: Forecast categories do not change results" /></div>
+            <div class="field"><label>Module</label><select id="defectModule"></select></div>
+            <div class="field"><label>Severity</label><select id="defectSeverity"><option>Critical</option><option>High</option><option selected>Medium</option><option>Low</option></select></div>
+            <div class="field"><label>Related exercise ID</label><input id="defectExercise" placeholder="Ex: 3.2" /></div>
+            <div class="field"><label>Details</label><textarea id="defectDetails" placeholder="Steps to reproduce, actual result, expected result, Userback reference"></textarea></div>
+            <button class="btn btn-secondary" id="addDefectBtn">Add defect</button>
+          </div>
+        </div>
+        <div class="card">
+          <h3 style="margin-top:0;">Userback guidance</h3>
+          <div class="instruction">
+            Submit issues in CUS using the Userback feedback link located in the bottom-right corner. After submission, paste the Userback ticket or reference number into the defect details here so your exported summary stays traceable.
+          </div>
+          <p class="small muted">Recommended flow: reproduce issue → submit in Userback → capture ticket reference → mark exercise as Fail or Blocked → log it here.</p>
+        </div>
+      </div>
+      <div class="card" style="margin-top:1rem;">
+        <div class="toolbar">
+          <h3 style="margin:0;">Defect register</h3>
+          <button class="btn btn-ghost" id="exportDefectsBtn">Export defects CSV</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>ID</th><th>Title</th><th>Module</th><th>Severity</th><th>Exercise</th><th>Status</th><th>Details</th></tr></thead>
+            <tbody id="defectTable"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section id="rtm" class="panel">
+      <div class="card">
+        <h3 style="margin-top:0;">Coverage by module</h3>
+        <div id="coverageGrid" class="grid"></div>
+      </div>
+    </section>
+
+    <section id="reports" class="panel">
+      <div class="grid two-col">
+        <div class="card">
+          <h3 style="margin-top:0;">Execution summary</h3>
+          <div id="reportSummary" class="small"></div>
+        </div>
+        <div class="card">
+          <h3 style="margin-top:0;">Hosting and database guidance</h3>
+          <ol class="small muted">
+            <li><strong>No database needed for this version:</strong> this app runs fully in-browser and exports JSON or CSV files for handoff.</li>
+            <li><strong>If you want persistence:</strong> create a Supabase project with tables for testers, exercises, results, and defects; then replace the in-memory arrays with API calls.</li>
+            <li><strong>Suggested tables:</strong> testers(id,name,access_level), modules(id,name), exercises(id,module_id,title,role_scope), results(id,tester_id,exercise_id,status,notes,executed_at), defects(id,result_id,title,severity,userback_ref,details,status).</li>
+            <li><strong>Suggested hosting:</strong> GitHub Pages for static hosting, or Netlify/Vercel if you later add serverless functions.</li>
+            <li><strong>Supabase setup:</strong> create project, define the tables above, enable Row Level Security, create policies by tester role, then store the project URL and anon key in the app config.</li>
+            <li><strong>Deployment:</strong> rename this file to index.html, push to a GitHub repo, enable Pages, and share the published URL.</li>
+          </ol>
+        </div>
+      </div>
+    </section>
+
+    <section id="signoff" class="panel">
+      <div class="grid two-col">
+        <div class="card">
+          <h3 style="margin-top:0;">Sign-off</h3>
+          <div class="grid">
+            <div class="field"><label>Business owner</label><input id="signBusiness" placeholder="Name" /></div>
+            <div class="field"><label>UAT lead</label><input id="signLead" placeholder="Name" /></div>
+            <div class="field"><label>Decision</label><select id="signDecision"><option>Go</option><option selected>Conditional Go</option><option>No-Go</option></select></div>
+            <div class="field"><label>Accepted risks / known issues</label><textarea id="signRisks" placeholder="List accepted defects or concerns"></textarea></div>
+            <button class="btn btn-primary" id="captureSignoffBtn">Capture sign-off timestamp</button>
+          </div>
+        </div>
+        <div class="card">
+          <h3 style="margin-top:0;">Recorded sign-off</h3>
+          <div id="signoffBox" class="signature small muted">No sign-off captured yet.</div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+<div class="toast-wrap" id="toastWrap"></div>
+<script>
+const CUS_URL = 'https://unified-test.circlemsp.com/';
+const storageKey = 'circle-msp-uat-runner-state-v2';
+const appData = {
+  modules: [
+    { id: 1, name: 'Authentication & Session Management', role: 'Standard', exercises: [
+      ['1.1','Reach the login form','Navigate to CUS and confirm the login page renders correctly.'],
+      ['1.2','Start Microsoft SSO','Select Continue with Microsoft and confirm redirect.'],
+      ['1.3','Authenticate with Microsoft','Complete Microsoft authentication and consent if prompted.'],
+      ['1.4','Accept consent prompt','Accept consent if prompted and confirm redirect back to CUS.'],
+      ['1.5','Validate session creation','Confirm redirect to dashboard with role-appropriate content.'],
+      ['1.6','Confirm successful login','Review the dashboard after redirect for expected content.'],
+      ['1.7','Confirm active session','Verify protected content is visible.'],
+      ['1.8','Open profile menu','Open the avatar menu and confirm Logout is available.'],
+      ['1.9','Logout','Logout from the application.'],
+      ['1.10','Verify login form after logout','Confirm the login form is shown again.'],
+      ['1.11','Verify protected route is blocked after logout','Attempt a protected URL and confirm access is blocked.']
+    ]},
+    { id: 2, name: 'Activities Dashboard & User Settings', role: 'Standard', exercises: [
+      ['2.1','Navigate to Activities','Open the Activities home page.'],
+      ['2.2','Update theme and accent settings','Change theme and accent and confirm immediate UI change.'],
+      ['2.3','Validate trend chart hover','Check tooltip values for Appointments, Calls, and Emails.'],
+      ['2.4','Refresh dashboard','Refresh the Activities dashboard without error.'],
+      ['2.5','Export activity trend','Export to Excel and validate download.'],
+      ['2.6','Validate engagement heatmap','Hover cells and verify metric details.'],
+      ['2.7','Admin filters on Activities','Verify Team, Sales Rep, and date filters update results.', 'Administrator']
+    ]},
+    { id: 3, name: 'Forecast Dashboard & Opportunity Breakdown', role: 'Standard', exercises: [
+      ['3.1','Open Forecast and Print Forecast','Open Opportunity Breakdown from Forecast.'],
+      ['3.2','Validate forecast categories','Test Print, OTR, MRR, and AV categories.'],
+      ['3.3','Recent Events to Open Opportunities','Confirm navigation to open opportunities.'],
+      ['3.4','Validate Forecast Tracker','Switch categories and confirm correct labels and values.'],
+      ['3.5','Refresh and service type drill-down','Refresh then open each listed service type drill-down from Forecast.'],
+      ['3.6','Hover Forecast Trend Over Time','Confirm tooltip totals display.'],
+      ['3.7','Apply forecast period filters','Test quarter, month, and year filters.'],
+      ['3.8','Admin filters on Forecast','Validate All Teams, Sales Rep, and date selector behavior.', 'Administrator']
+    ]},
+    { id: 4, name: 'Scoreboard & Performance Metrics', role: 'Standard', exercises: [
+      ['4.1','Apply scoreboard time filters','Test This Month, This Quarter, and Last Quarter.'],
+      ['4.2','Target attainment drill-down','Open detail windows for breakpoints.'],
+      ['4.3','Total Closed and Conversion Rate','Open both metric detail windows.'],
+      ['4.4','Review top performance leaderboard','Verify figures display.'],
+      ['4.5','Hover Performance vs Target','Validate tooltip breakdown.'],
+      ['4.6','Closed opportunities by type','Open filtered opportunities for each service type.'],
+      ['4.7','Monthly Performance Trend','Check tooltip values across the chart.'],
+      ['4.8','Revenue by Sales Rep','Validate the lower section is populated.'],
+      ['4.9','Admin filters on Scoreboard','Validate Team, Sales Rep, and date selectors.', 'Administrator']
+    ]},
+    { id: 5, name: 'Opportunities List, Kanban, Detail, and Opportunity Creation', role: 'Standard', exercises: [
+      ['5.1','Navigate to Opportunities','Open Sales > Opportunities.'],
+      ['5.2','Validate opportunity widgets','Test Print, MRR, OTR, Open, and Closed widgets.'],
+      ['5.3','Clear widget filter','Return to the broader default opportunity view.'],
+      ['5.4','Bulk change stage from list view','Change stage for one selected opportunity from list view.'],
+      ['5.5','Validate predefined opportunity filters','Apply saved filters and validate Service Type context.'],
+      ['5.6','Open custom filter dialog','Open the custom opportunity filter dialog.'],
+      ['5.7','Validate list and Kanban toggles','Confirm list/kanban switching behaves correctly.'],
+      ['5.8','Validate Kanban stages and quick view','Confirm stages and open quick view from Kanban.'],
+      ['5.9','Validate opportunity quick view actions','Test activity, full detail, and create proposal actions.'],
+      ['5.10','Open full opportunity detail','Open the full opportunity overview.'],
+      ['5.11','Validate opportunity tabs','Open Notes, Contacts, Solutions, Proposals, Documents, Splits, and Activities.'],
+      ['5.12','Validate opportunity detail fields','Review service type, value, revenue, probability, owner, and sales rep.'],
+      ['5.13','Validate probability by stage','Confirm probability mappings for Target, First Appointment, and Assessment.'],
+      ['5.14','Validate opportunity actions menu','Confirm Edit, Change Stage, Mark Won, Mark Lost, and Delete.'],
+      ['5.15','Validate edit opportunity','Open Edit and review editable fields, then cancel.'],
+      ['5.16','Validate change stage from detail','Change stage from opportunity detail and verify Overview updates.'],
+      ['5.17','Create new opportunity from opportunities page','Open the New Opportunity dialog from Opportunities.'],
+      ['5.18','Create new opportunity from company record','Open New Opportunity from a company record and confirm company is prefilled.'],
+      ['5.19','Create organic opportunity from company','Start a test AV opportunity directly from a company.'],
+      ['5.20','Validate contact selection during opportunity creation','Confirm associated contacts, search, and new-contact options.'],
+      ['5.21','Validate opportunity creation for IT/AV','Save the AV opportunity and confirm it opens successfully.'],
+      ['5.22','Validate solution visibility on opportunity','Review Solutions tab for created solution visibility.'],
+      ['5.23','Validate multiple solutions on opportunity','Confirm more than one solution can be visible where supported.'],
+      ['5.24','Create IT/AV proposal from opportunity','Generate an IT or AV proposal with template, contact, and solution.'],
+      ['5.25','Validate IT/AV proposal push to KQM','Push the IT proposal to KQM and confirm synced state.'],
+      ['5.26','Validate IT proposal statuses','Review Draft through Won status progression options.'],
+      ['5.27','Validate bidirectional sync between CUS and KQM','Confirm KQM status changes reflect back in CUS.'],
+      ['5.28','Validate proposal-related tabs on opportunity','Review Solutions, Notes, and Activities after proposal creation.'],
+      ['5.29','Validate proposal filtering by category','Confirm proposal filtering by IT and Print where supported.'],
+      ['5.30','Validate admin approval visibility for Print proposals','Confirm Approvals visibility for print approvals.', 'Administrator'],
+      ['5.31','Create Print opportunity from Opportunities page','Create a new Managed Print opportunity with required values.'],
+      ['5.32','Validate print opportunity ownership and assignment','Review ownership and split assignment support.'],
+      ['5.33','Validate required contacts for Print opportunity','Review Main, Billing, and IT contacts where configured.'],
+      ['5.34','Add Print solution via configurator','Open Solution Configurator, add model and accessory, and save.'],
+      ['5.35','Validate Financial Calculator for Print solution','Open calculator and confirm values apply back correctly.'],
+      ['5.36','Create Print proposal from Print opportunity','Create a print proposal with template, solution, and contact.'],
+      ['5.37','Validate Print proposal does not push to KQM','Confirm Save appears instead of Push to KQM.'],
+      ['5.38','Validate Print proposal preview and download','Test preview and download where supported.'],
+      ['5.39','Validate synced IT proposal visibility in CUS','Confirm synced IT proposal and solution remain visible in CUS.'],
+      ['5.40','Validate role-based button visibility on proposal','Confirm actions align to the logged-in role.']
+    ]},
+    { id: 6, name: 'Companies List, Filters, and New Company Setup', role: 'Standard', exercises: [
+      ['6.1','Navigate to Companies','Open CRM > Companies.'],
+      ['6.2','Company view categories','Test Customers, No AM, No Rep, and Prospects.'],
+      ['6.3','Open and return from company record','Open a company and return to the list.'],
+      ['6.4','Sort company list','Sort by each available sortable column.'],
+      ['6.5','Pagination and page count','Test page navigation and item counts.'],
+      ['6.6','Apply existing company filter','Apply a saved filter and validate context.'],
+      ['6.7','Create new filter by industry','Create and apply Industry = Health Care filter.'],
+      ['6.8','Start new company creation','Confirm fields accept input.'],
+      ['6.9','Validate sales assignment defaults','Review role-based defaults and Additional Reps.'],
+      ['6.10','Primary contact step','Enter contact details and review options.'],
+      ['6.11','Previous and next navigation','Move backward and forward without issue.'],
+      ['6.12','Admin rep visibility','Validate Rep column scope.', 'Administrator'],
+      ['6.13','Admin company filter by sales rep','Create and apply rep-based company filter.', 'Administrator']
+    ]},
+    { id: 7, name: 'Company Quick View, Detail, Notes, Locations, Activity Logging', role: 'Standard', exercises: [
+      ['7.1','Open company quick view sidebar','Use the eye icon and confirm summary sidebar.'],
+      ['7.2','Validate quick view actions','Test activity, email, phone, add opportunity, and add contact actions.'],
+      ['7.3','Validate summary fields and actions menu','Confirm summary data and Actions menu items.'],
+      ['7.4','Company classification add/remove','Add then remove classification.'],
+      ['7.5','Snapshot, tabs, and empty states','Open tabs and confirm correct view or empty state.'],
+      ['7.6','Locations and notes','Open Add Location then cancel; add and save a note.'],
+      ['7.7','Quick action hover and launch','Validate Log Call behavior.'],
+      ['7.8','Validate Log Call defaults','Confirm company/contact prepopulation.'],
+      ['7.9','Objective, date/time, docs, duration, outcome, notes','Review input controls and values.'],
+      ['7.10','Schedule follow-up and save activity','Add follow-up then save activity.'],
+      ['7.11','Validate timeline and upcoming activity','Confirm appearance in Next Activity and Activities dashboard.'],
+      ['7.12','Repeat company activity logging for other types','Repeat for Email, Meeting, and Text.'],
+      ['7.13','Primary contact shortcuts','Validate phone, email, and open-contact actions.']
+    ]},
+    { id: 8, name: 'Contacts List, Quick View, Full Contact, Linked Company, Activity Logging', role: 'Standard', exercises: [
+      ['8.1','Navigate to Contacts','Open Contacts from left menu.'],
+      ['8.2','Validate contact widgets','Test No Email, No LinkedIn, No Mobile, No Phone widgets.'],
+      ['8.3','Contacts pagination','Move forward and back one page.'],
+      ['8.4','Create primary contact filter','Create Is Primary Contact = True filter.'],
+      ['8.5','Open contact quick view','Use the eye icon to open sidebar.'],
+      ['8.6','Validate quick view actions','Check activity types and full contact navigation.'],
+      ['8.7','Validate full contact tabs and edit','Open tabs and edit flow.'],
+      ['8.8','Log contact activity','Save one contact activity via quick actions.'],
+      ['8.9','Validate timeline and next activity','Confirm saved activity and follow-up visibility.'],
+      ['8.10','Validate linked company from contact','Open linked company and verify alignment.'],
+      ['8.11','Sort contact list','Sort Contact, Email, Company, Phone, and Title.'],
+      ['8.12','Admin contact filter validation','Validate primary contact filter as admin.', 'Administrator']
+    ]}  ],
+  results: {},
+  defects: [],
+  signoff: null,
+  skippedModules: [],
+  activeModuleId: null
+};
+
+const navItems = [
+  ['dashboard','Dashboard'],['modules','Modules'],['defects','Defect Log'],['rtm','RTM'],['reports','Reports'],['signoff','Sign-Off']
+];
+
+const state = { chart: null };
+
+function visibleExercises(){
+  const access = document.getElementById('accessLevel').value;
+  return appData.modules.flatMap(m => m.exercises.map(ex => ({module:m, exercise:ex}))).filter(item => access === 'All' || (item.exercise[3] ? item.exercise[3] === access : item.module.role === 'Standard' || access === 'Administrator'));
+}
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { 
+    getFirestore, 
+    doc, 
+    setDoc, 
+    getDoc,
+    onSnapshot 
+  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+ const firebaseConfig = {
+  apiKey: "AIzaSyBN3HhBCPWqPsPAv-1N1rr8IMcFiOec_6k",
+  authDomain: "cus-user-acceptance-test-34fb7.firebaseapp.com",
+  projectId: "cus-user-acceptance-test-34fb7",
+  storageBucket: "cus-user-acceptance-test-34fb7.firebasestorage.app",
+  messagingSenderId: "968072365527",
+  appId: "1:968072365527:web:813c57fe7535b63dab3792",
+  measurementId: "G-2W0WMN900J"
+};
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  // Global app state that will sync to Firebase
+  let currentSessionId = null;
+  let appData = { results: {}, defects: [], skippedModules: [], activeModuleId: null };
+
+  async function saveToFirebase() {
+    if (!currentSessionId) return;
+    
+    try {
+      await setDoc(doc(db, "sessions", currentSessionId), {
+        ...appData,
+        testerName: document.getElementById('testerName').value.trim(),
+        accessLevel: document.getElementById('accessLevel').value,
+        updatedAt: new Date().toISOString()
+      });
+      showToast('Saved to cloud ✅');
+    } catch (error) {
+      showToast('Save failed: ' + error.message);
+    }
+  }
+
+  async function loadFromFirebase() {
+    if (!currentSessionId) return;
+    
+    try {
+      const snap = await getDoc(doc(db, "sessions", currentSessionId));
+      if (snap.exists()) {
+        const data = snap.data();
+        appData.results = data.results || {};
+        appData.defects = data.defects || [];
+        appData.skippedModules = data.skippedModules || [];
+        appData.activeModuleId = data.activeModuleId || null;
+        showToast('Loaded from cloud ✅');
+        // Trigger UI update
+        updateModuleList();
+        updateResultsDisplay();
+      }
+    } catch (error) {
+      showToast('Load failed: ' + error.message);
+    }
+  }
+
+  // Listen for changes from other devices
+  function startRealtimeSync() {
+    if (!currentSessionId) return;
+    onSnapshot(doc(db, "sessions", currentSessionId), (snap) => {
+      if (snap.exists()) {
+        const data = snap.data();
+        appData.results = data.results || {};
+        appData.defects = data.defects || [];
+        appData.skippedModules = data.skippedModules || [];
+        appData.activeModuleId = data.activeModuleId || null;
+        updateModuleList();
+        updateResultsDisplay();
+      }
+    });
+  }
+
+  // Replace all existing localStorage calls with these
+  window.saveState = saveToFirebase;
+  window.loadState = loadFromFirebase;
+  window.startSync = startRealtimeSync;
+</script>
+function getResult(id){ return appData.results[id] || {status:'Not Executed',notes:'',tester:''}; }
+function moduleByExercise(id){ return appData.modules.find(m => m.exercises.some(ex => ex[0] === id)); }
+function moduleVisibleExercises(module){ const access = document.getElementById('accessLevel').value; return module.exercises.filter(ex => access === 'All' || access === 'Administrator' ? true : !ex[3]); }
+function isModuleComplete(moduleId){ const module = appData.modules.find(m=>m.id===moduleId); const exs = moduleVisibleExercises(module); return exs.length > 0 && exs.every(ex => getResult(ex[0]).status !== 'Not Executed'); }
+function canAccessModule(moduleId){ if(appData.skippedModules.includes(moduleId)) return true; if(appData.activeModuleId === null) return true; return appData.activeModuleId === moduleId || isModuleComplete(appData.activeModuleId); }
+function startModule(moduleId){ if(appData.skippedModules.includes(moduleId)){ appData.skippedModules = appData.skippedModules.filter(id => id !== moduleId); } if(appData.activeModuleId && appData.activeModuleId !== moduleId && !isModuleComplete(appData.activeModuleId)){ toast(`Finish Module ${appData.activeModuleId} before moving on`); return false; } appData.activeModuleId = moduleId; saveState(); return true; }
+function syncActiveModule(){ if(appData.activeModuleId && isModuleComplete(appData.activeModuleId)){ const remaining = appData.modules.filter(m => !appData.skippedModules.includes(m.id)).find(m => !isModuleComplete(m.id)); appData.activeModuleId = remaining ? remaining.id : null; } saveState(); }
+function setResult(id, patch){ const module = moduleByExercise(id); if(module){ if(!startModule(module.id)) return; } appData.results[id] = {...getResult(id), ...patch, updatedAt:new Date().toISOString()}; syncActiveModule(); saveState(); updateAll(); }
+
+function buildNav(){
+  const nav = document.getElementById('nav');
+  nav.innerHTML = navItems.map(([id,label],i)=>`<button class="${i===0?'active':''}" data-panel="${id}">${label}</button>`).join('');
+  nav.querySelectorAll('button').forEach(btn=>btn.addEventListener('click',()=>{
+    document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+    document.getElementById(btn.dataset.panel).classList.add('active');
+  }));
+}
+
+function buildModules(){
+  const access = document.getElementById('accessLevel').value;
+  const wrap = document.getElementById('modules');
+  wrap.innerHTML = '<div class="filters"><div class="instruction">Use this app in one window and CUS in another. You may skip a module before starting it. Once you begin a module, every exercise in that module must be completed before another module can be started, and that rule is saved if you close and reopen the app.</div></div><div class="grid"></div>'; 
+  const grid = wrap.querySelector('.grid');
+  appData.modules.forEach(module=>{
+    const exercises = module.exercises.filter(ex => access === 'All' || access === 'Administrator' ? true : !ex[3]);
+    const total = exercises.length;
+    const executed = exercises.filter(ex => getResult(ex[0]).status !== 'Not Executed').length;
+    const skippedModule = appData.skippedModules.includes(module.id);
+    const locked = !canAccessModule(module.id);
+    const card = document.createElement('section');
+    card.className = 'module-card';
+    card.innerHTML = `
+      <div class="module-head">
+        <div>
+          <span class="badge">Module ${module.id}</span>
+          <h3 style="margin:.5rem 0 .35rem;">${module.name}</h3>
+          <p class="small muted" style="margin:0;">Exercises: ${total} | Executed: ${executed}</p>
+        </div>
+        <div style="display:grid;gap:.5rem;justify-items:end;">
+          <div class="status-tag">${skippedModule ? 'Skipped module' : locked ? 'Locked' : appData.activeModuleId === module.id ? 'In progress' : isModuleComplete(module.id) ? 'Complete' : module.role}</div>
+          <div class="inline" style="justify-content:flex-end;">
+            <button class="status-btn skip" data-skip-module="${module.id}" ${executed > 0 || appData.activeModuleId === module.id ? 'disabled' : ''}>Skip module</button>
+            <button class="status-btn" style="background:var(--color-surface);border:1px solid var(--color-border);color:var(--color-text)" data-start-module="${module.id}" ${skippedModule || locked ? 'disabled' : ''}>Start module</button>
+          </div>
+        </div>
+      </div>
+      <div class="exercise-list"></div>`;
+    const list = card.querySelector('.exercise-list');
+    exercises.forEach(ex=>{
+      const res = getResult(ex[0]);
+      const disabled = skippedModule || locked ? 'disabled' : ''; 
+      const div = document.createElement('article');
+      div.className='exercise';
+      div.innerHTML = `
+        <header>
+          <div>
+            <div class="small muted">Exercise ${ex[0]} ${ex[3] ? '• Admin only' : ''}</div>
+            <h4>${ex[1]}</h4>
+          </div>
+          <div class="status-tag">${res.status}</div>
+        </header>
+        <div class="small">${ex[2]}</div>
+        <div class="field" style="margin-top:.75rem;"><label>Execution notes</label><textarea data-note="${ex[0]}" placeholder="Capture what you validated, evidence, or Userback reference" ${disabled}>${res.notes || ''}</textarea></div>
+        <div class="actions">
+          <button class="status-btn pass" data-id="${ex[0]}" data-status="Pass" ${disabled}>Pass ✅</button>
+          <button class="status-btn fail" data-id="${ex[0]}" data-status="Fail" ${disabled}>Fail ❌</button>
+          <button class="status-btn blocked" data-id="${ex[0]}" data-status="Blocked" ${disabled}>Blocked 🚫</button>
+          <button class="status-btn skip" data-id="${ex[0]}" data-status="Skipped" ${disabled}>Skip</button>
+          <button class="status-btn" style="background:var(--color-surface);border:1px solid var(--color-border);color:var(--color-text)" data-id="${ex[0]}" data-status="Not Executed" ${disabled}>Reset</button>
+        </div>`;
+      list.appendChild(div);
+    });
+    grid.appendChild(card);
+  });
+
+  wrap.querySelectorAll('[data-start-module]').forEach(btn=>btn.addEventListener('click',()=>{ if(startModule(Number(btn.dataset.startModule))){ toast(`Module ${btn.dataset.startModule} started`); updateAll(); } }));
+  wrap.querySelectorAll('[data-skip-module]').forEach(btn=>btn.addEventListener('click',()=>{ const id = Number(btn.dataset.skipModule); const module = appData.modules.find(m=>m.id===id); const hasResults = module.exercises.some(ex=>getResult(ex[0]).status !== 'Not Executed'); if(hasResults || appData.activeModuleId === id){ toast('You can only skip a module before it is started'); return; } if(!appData.skippedModules.includes(id)) appData.skippedModules.push(id); syncActiveModule(); saveState(); updateAll(); toast(`Module ${id} skipped`); }));
+  wrap.querySelectorAll('[data-status]').forEach(btn=>btn.addEventListener('click',()=>{
+    setResult(btn.dataset.id,{status:btn.dataset.status,tester:document.getElementById('testerName').value || ''});
+    toast(`Exercise ${btn.dataset.id} marked ${btn.dataset.status}`);
+  }));
+  wrap.querySelectorAll('[data-note]').forEach(el=>el.addEventListener('change',()=>setResult(el.dataset.note,{notes:el.value,tester:document.getElementById('testerName').value || ''})));
+}
+
+function metrics(){
+  const items = visibleExercises().filter(item => !appData.skippedModules.includes(item.module.id));
+  const total = items.length;
+  const statuses = items.map(i=>getResult(i.exercise[0]).status);
+  const executed = statuses.filter(s=>s !== 'Not Executed').length;
+  const passed = statuses.filter(s=>s === 'Pass').length;
+  const failed = statuses.filter(s=>s === 'Fail').length;
+  const blocked = statuses.filter(s=>s === 'Blocked').length;
+  const skipped = statuses.filter(s=>s === 'Skipped').length;
+  const passRate = executed ? Math.round((passed / executed) * 100) : 0;
+  return {total,executed,passed,failed,blocked,skipped,passRate};
+}
+
+function updateDashboard(){
+  const m = metrics();
+  mTotal.textContent = m.total;
+  mExecuted.textContent = m.executed;
+  mPassed.textContent = m.passed;
+  mFailed.textContent = m.failed;
+  mBlocked.textContent = m.blocked;
+  mPassRate.textContent = `${m.passRate}%`;
+  overallProgress.style.width = `${m.total ? Math.round((m.executed/m.total)*100) : 0}%`;
+  let goClass='conditional', goText='Conditional Go';
+  if(m.failed === 0 && m.blocked === 0 && m.executed === m.total && m.total > 0) { goClass='go'; goText='Go'; }
+  if(m.failed > 0 || m.blocked > 2) { goClass='nogo'; goText='No-Go'; }
+  goPill.className = `status-pill ${goClass}`;
+  goPill.textContent = goText;
+  renderChart(m);
+}
+
+function renderChart(m){
+  const ctx = document.getElementById('statusChart');
+  if(state.chart) state.chart.destroy();
+  state.chart = new Chart(ctx, {
+    type:'doughnut',
+    data:{labels:['Pass','Fail','Blocked','Skipped','Not Executed'],datasets:[{data:[m.passed,m.failed,m.blocked,m.skipped,m.total-m.executed],backgroundColor:['#2e7d32','#c62828','#ef6c00','#155fa0','#c8d8ea'],borderWidth:0}]},
+    options:{plugins:{legend:{position:'bottom'}}}
+  });
+}
+
+function buildDefectModules(){
+  defectModule.innerHTML = appData.modules.map(m=>`<option value="${m.name}">${m.name}</option>`).join('');
+}
+
+function renderDefects(){
+  defectTable.innerHTML = appData.defects.map(d=>`<tr><td>${d.id}</td><td>${d.title}</td><td>${d.module}</td><td>${d.severity}</td><td>${d.exercise}</td><td>${d.status}</td><td>${d.details}</td></tr>`).join('') || '<tr><td colspan="7" class="muted">No defects logged yet.</td></tr>';
+}
+
+function renderCoverage(){
+  const wrap = document.getElementById('coverageGrid');
+  wrap.innerHTML = '';
+  appData.modules.forEach(m=>{
+    const exercises = m.exercises.filter(ex => document.getElementById('accessLevel').value === 'Administrator' || document.getElementById('accessLevel').value === 'All' ? true : !ex[3]);
+    const total = exercises.length || 1;
+    const executed = exercises.filter(ex => getResult(ex[0]).status !== 'Not Executed').length;
+    const pct = Math.round((executed/total)*100);
+    const div = document.createElement('div');
+    div.className = 'card';
+    div.innerHTML = `<h4 style="margin:0 0 .5rem;">Module ${m.id}: ${m.name}</h4><div class="small muted">${executed} of ${total} executed</div><div class="coverage" style="margin-top:.75rem;"><span style="width:${pct}%"></span></div><div class="small" style="margin-top:.5rem;">Coverage ${pct}%</div>`;
+    wrap.appendChild(div);
+  });
+}
+
+function renderReport(){
+  const m = metrics();
+  const decision = document.getElementById('signDecision').value;
+  reportSummary.innerHTML = `
+    <p><strong>Execution:</strong> ${m.executed} of ${m.total} exercises executed.</p>
+    <p><strong>Results:</strong> ${m.passed} passed, ${m.failed} failed, ${m.blocked} blocked, ${m.skipped} skipped.</p>
+    <p><strong>Pass rate:</strong> ${m.passRate}%.</p>
+    <p><strong>Defects logged:</strong> ${appData.defects.length}.</p>
+    <p><strong>Skipped modules:</strong> ${appData.skippedModules.length ? appData.skippedModules.join(', ') : 'None'}.</p>
+    <p><strong>Current recommendation:</strong> ${goPill.textContent}.</p>
+    <p><strong>Sign-off decision selected:</strong> ${decision}.</p>`;
+}
+
+function captureSignoff(){
+  appData.signoff = {
+    businessOwner: signBusiness.value,
+    uatLead: signLead.value,
+    decision: signDecision.value,
+    risks: signRisks.value,
+    timestamp: new Date().toLocaleString()
+  };
+  signoffBox.innerHTML = `<strong>Business owner:</strong> ${appData.signoff.businessOwner || 'Not entered'}<br><strong>UAT lead:</strong> ${appData.signoff.uatLead || 'Not entered'}<br><strong>Decision:</strong> ${appData.signoff.decision}<br><strong>Captured:</strong> ${appData.signoff.timestamp}<br><strong>Accepted risks:</strong><br>${(appData.signoff.risks || 'None').replace(/\n/g,'<br>')}`;
+  toast('Sign-off captured');
+}
+
+function exportData(format='json'){
+  const payload = {
+    tester: testerName.value,
+    accessLevel: accessLevel.value,
+    metrics: metrics(),
+    results: appData.results,
+    defects: appData.defects,
+    signoff: appData.signoff,
+    exportedAt: new Date().toISOString()
+  };
+  let blob, fileName;
+  if(format === 'json'){
+    blob = new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
+    fileName = 'circle-msp-uat-summary.json';
+  } else {
+    const rows = [['exercise_id','status','tester','notes','updated_at']];
+    Object.entries(appData.results).forEach(([id,val])=>rows.push([id,val.status || '',val.tester || '',(val.notes || '').replace(/\n/g,' '),val.updatedAt || '']));
+    blob = new Blob([rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n')],{type:'text/csv'});
+    fileName = 'circle-msp-uat-summary.csv';
+  }
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = fileName; a.click();
+  toast(`Exported ${fileName}`);
+}
+
+function exportDefects(){
+  const rows = [['id','title','module','severity','exercise','status','details']].concat(appData.defects.map(d=>[d.id,d.title,d.module,d.severity,d.exercise,d.status,d.details.replace(/\n/g,' ')]));
+  const blob = new Blob([rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n')],{type:'text/csv'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = 'circle-msp-defects.csv'; a.click();
+  toast('Exported defects CSV');
+}
+
+function addDefect(){
+  const defect = {
+    id:`DEF-${new Date().getFullYear()}-${String(appData.defects.length+1).padStart(3,'0')}`,
+    title:defectTitle.value.trim(),
+    module:defectModule.value,
+    severity:defectSeverity.value,
+    exercise:defectExercise.value.trim(),
+    status:'Open',
+    details:defectDetails.value.trim()
+  };
+  if(!defect.title){ toast('Enter a defect title'); return; }
+  appData.defects.push(defect);
+  defectTitle.value=''; defectExercise.value=''; defectDetails.value='';
+  renderDefects(); renderReport();
+  toast(`Logged defect ${defect.id}`);
+}
+
+function seedData(){ appData.skippedModules = []; appData.activeModuleId = null;
+  ['1.1','1.2','1.3','1.4','2.1','2.2','2.3','3.1','3.2','4.1','5.1','6.1','7.1'].forEach(id=>setResult(id,{status:'Pass',tester:'Sample Tester'}));
+  ['2.5','3.6','6.10'].forEach(id=>setResult(id,{status:'Fail',tester:'Sample Tester',notes:'Sample failure captured and reported in Userback'}));
+  ['4.9','5.12'].forEach(id=>setResult(id,{status:'Blocked',tester:'Sample Tester'}));
+  toast('Sample data loaded');
+}
+
+function toast(msg){
+  const el = document.createElement('div');
+  el.className='toast'; el.textContent=msg; toastWrap.appendChild(el);
+  setTimeout(()=>el.remove(),2600);
+}
+
+function updateAll(){ buildModules(); updateDashboard(); renderCoverage(); renderReport(); }
+
+loadState(); buildNav(); buildModules(); buildDefectModules(); renderDefects(); renderCoverage(); renderReport(); updateDashboard();
+
+document.getElementById('openCusBtn').addEventListener('click',()=>window.open(CUS_URL,'_blank','noopener,noreferrer'));
+document.getElementById('themeToggle').addEventListener('click',()=>{
+  const html = document.documentElement;
+  html.setAttribute('data-theme', html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+  updateDashboard();
+});
+seedDataBtn.addEventListener('click', seedData);
+exportBtn.addEventListener('click', ()=>exportData('json'));
+exportCsvBtn.addEventListener('click', ()=>exportData('csv'));
+exportDefectsBtn.addEventListener('click', exportDefects);
+addDefectBtn.addEventListener('click', addDefect);
+captureSignoffBtn.addEventListener('click', captureSignoff);
+accessLevel.addEventListener('change', updateAll);
+testerName.addEventListener('change', ()=>toast('Tester name updated'));
+</script>
+</body>
+</html>
